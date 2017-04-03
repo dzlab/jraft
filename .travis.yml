@@ -16,6 +16,9 @@ script:
 cache:
   directories:
     - $HOME/.m2/repository
-    - $HOME/.sonar
+    - $HOME/.sonar/cache
     - $HOME/jvm
     - $HOME/maven
+
+notifications:
+    email: false

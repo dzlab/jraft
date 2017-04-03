@@ -9,5 +9,4 @@ export MAVEN_OPTS="-Xmx1G -Xms128m"
 mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar \
   $MAVEN_ARGS \
   -Dsonar.host.url=$SONAR_HOST_URL \
-  -Dsonar.login=$SONAR_TOKEN \
   -Dsonar.projectVersion=$INITIAL_VERSION
