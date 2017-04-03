@@ -103,7 +103,9 @@
             </goals>
             <configuration>
               <skip>${skip.sequential.tests}</skip>
-              <includes>**/*TestSeq.java</includes>
+              <includes>
+                <include>**/*TestSeq.java</include>
+              </includes>
               <reuseForks>false</reuseForks>
             </configuration>
           </execution>
