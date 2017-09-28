@@ -1,11 +1,13 @@
 package dz.lab.jraft;
 
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A mock for {@link Timer} to have more control on task scheduling in tests.
@@ -13,7 +15,7 @@ import java.util.logging.Logger;
 public class TimerMock extends Timer
 {
 
-  protected static final Logger LOG = Logger.getLogger(TimerMock.class.getSimpleName());
+  private static final Logger LOG = LoggerFactory.getLogger(TimerMock.class);
 
   private final Collection<TimerTaskWrapper> tasks;
 

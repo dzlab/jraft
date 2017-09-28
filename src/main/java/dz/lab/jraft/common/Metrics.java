@@ -45,7 +45,7 @@ public class Metrics implements Lifecycle {
 
 
   /**
-   * Get a new counter.
+   * Get a new {@link Counter}.
    * @param clazz
    * @param names
    * @return
@@ -56,7 +56,7 @@ public class Metrics implements Lifecycle {
   }
 
   /**
-   * Get a new Meter.
+   * Get a new {@link Meter}.
    * @param clazz
    * @param names
    * @return
@@ -64,6 +64,16 @@ public class Metrics implements Lifecycle {
   public Meter getMeter(Class clazz, String... names)
   {
     return metrics.meter(MetricRegistry.name(clazz, names));
+  }
+
+  /**
+   * Get a new {@link Timer}.
+   * @param clazz
+   * @param names
+   * @return
+   */
+  public Timer getTimer(Class clazz, String... names) {
+    return metrics.timer(MetricRegistry.name(clazz, names));
   }
 
 }

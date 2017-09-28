@@ -59,6 +59,16 @@ public class Configuration {
   }
 
   /**
+   * Get an {@link Integer} configuration property by its key.
+   * @param key the key of the property.
+   * @return the {@link Integer} value if found, otherwise <code>null</code>.
+   */
+  public Integer getInt(String key)
+  {
+    return (Integer) this.props.get(key);
+  }
+
+  /**
    * Get a randomly chosen election timeout if a default timeout is not set.
    * The timeout amount should be higher than broadcast time.
    * @return a random timeout amount.

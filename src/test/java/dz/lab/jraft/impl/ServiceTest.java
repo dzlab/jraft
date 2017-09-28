@@ -7,6 +7,7 @@ import java.util.List;
 
 import dz.lab.jraft.Message;
 import dz.lab.jraft.RaftServer;
+import dz.lab.jraft.Storage;
 import dz.lab.jraft.TimerMock;
 import dz.lab.jraft.common.Configuration;
 import dz.lab.jraft.model.AppendEntriesResult;
@@ -18,6 +19,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.mockito.Mockito.mock;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -53,8 +55,9 @@ public class ServiceTest
   @Test
   public void testInitialisation()
   {
+    Storage storage = mock(Storage.class);
     Configuration conf = new Configuration(10);
-    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), t, conf);
+    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), storage, t, conf);
     State s = srv.getState();
     assertEquals("s1", srv.getId());
     assertEquals(ServerRole.Follower, s.getRole());
@@ -69,8 +72,9 @@ public class ServiceTest
   @Test
   public void testFollowerCandidate()
   {
+    Storage storage = mock(Storage.class);
     Configuration conf = new Configuration(10);
-    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), t, conf);
+    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), storage, t, conf);
     State s = srv.getState();
     srv.reset();
     // after timeout the server should become candidate
@@ -92,8 +96,9 @@ public class ServiceTest
   @Test
   public void testCandidateFollower()
   {
+    Storage storage = mock(Storage.class);
     Configuration conf = new Configuration(10);
-    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), t, conf);
+    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), storage, t, conf);
     State s = srv.getState();
     srv.reset();
     // after timeout the server should become candidate
@@ -142,8 +147,9 @@ public class ServiceTest
   @Test
   public void testRequestVote() 
   {
+    Storage storage = mock(Storage.class);
     Configuration conf = new Configuration(10);
-    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), t, conf);
+    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), storage, t, conf);
     State s = srv.getState();
     srv.reset();
     // check term updates
@@ -180,8 +186,9 @@ public class ServiceTest
   @Test
   public void testAppendEntries() 
   {
+    Storage storage = mock(Storage.class);
     Configuration conf = new Configuration(10);
-    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), t, conf);
+    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), storage, t, conf);
     State s = srv.getState();
     srv.reset();
     // check fail if term less than current
@@ -222,8 +229,9 @@ public class ServiceTest
   @Test
   public void testProcess()
   {
+    Storage storage = mock(Storage.class);
     Configuration conf = new Configuration(10);
-    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), t, conf);
+    RaftServiceImpl srv = new RaftServiceImpl(new BasicServer("s1"), storage, t, conf);
     State s = srv.getState();
     srv.reset();
     boolean result;

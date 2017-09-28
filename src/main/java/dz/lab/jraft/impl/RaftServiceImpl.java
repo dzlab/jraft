@@ -1,5 +1,6 @@
 package dz.lab.jraft.impl;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -7,45 +8,62 @@ import java.util.TimerTask;
 import dz.lab.jraft.Message;
 import dz.lab.jraft.RaftServer;
 import dz.lab.jraft.RaftService;
+import dz.lab.jraft.Storage;
 import dz.lab.jraft.common.Configuration;
+import dz.lab.jraft.common.Constants;
 import dz.lab.jraft.common.Metrics;
-import dz.lab.jraft.model.LogEntry;
-import dz.lab.jraft.model.AppendEntriesResult;
+import dz.lab.jraft.model.*;
 import dz.lab.jraft.model.Types.*;
-import dz.lab.jraft.model.VoteMessage;
-import dz.lab.jraft.model.RequestVoteResult;
 
 /**
  * An implementation of {@link RaftService}.
  */
 public class RaftServiceImpl implements RaftService
 {
-  // server state
+  /**
+   * server state
+   */
   private State state;
-  // lock for synchronising access to state.
+  /**
+   * lock for synchronising access to state.
+   */
   private final Object lock;
-
-  // raft server
+  /**
+   * raft server
+   */
   private final RaftServer server;
-  // timer for scheduling tasks
+  /**
+   * storage provider.
+   */
+  private final Storage storage;
+  /**
+   * timer for scheduling tasks
+   */
   private final Timer timer;
-  // election timeout: time amount to wait for messages from Leader
-  private final long timeout;
-  // task to convert current server to Candidate
+  /**
+   * task to convert current server to Candidate
+   */
   private ElectionTask task;
+  /**
+   * configuration information.
+   */
+  private final Configuration config;
 
   /**
    * Default constructor.
    */
-  public RaftServiceImpl(RaftServer server, Timer timer, Configuration config)
+  public RaftServiceImpl(RaftServer server, Storage storage, Timer timer, Configuration config)
   {
     assert server != null;
+    assert storage != null;
     assert timer != null;
+    assert config != null;
     this.lock = new Object();
     this.server = server;
+    this.storage = storage;
     this.state = new State(server.getId());
     this.timer = timer;
-    this.timeout = config.getRandomTimemout();
+    this.config = config;
   }
 
   /**
@@ -72,7 +90,7 @@ public class RaftServiceImpl implements RaftService
     if(this.timer != null)
     {
       // log warn cannot schedule task as no scheduler is defined
-      this.timer.schedule(this.task, this.timeout);
+      this.timer.schedule(this.task, this.config.getRandomTimemout());
     }
   }
 
@@ -108,6 +126,7 @@ public class RaftServiceImpl implements RaftService
     {
       return false;
     }
+
     return true;
   }
 
@@ -190,7 +209,13 @@ public class RaftServiceImpl implements RaftService
         // add
         s.addVoter(id);
         // check if we have majority
-
+        if(s.voterIds.size() > config.getInt(Constants.CLUSTER_SIZE)/2) {
+          s.setRole(ServerRole.Leader);
+          long lastLogIndex = s.getLogs().size();
+          long lastLogTerm = lastLogIndex > 0 ? s.getEntryAt(lastLogIndex).getTerm(): 0;
+          Message req = AppendMessage.createRequest(s.getTerm(), getId(), lastLogIndex, lastLogTerm, Collections.<LogEntry>emptyList(), s.commitIndex);
+          this.server.send(req);
+        }
       }
     }
   }
@@ -204,7 +229,7 @@ public class RaftServiceImpl implements RaftService
    * @param entries log entries to store (empty for heartbeat; may send more than one for efficiency)
    * @param leaderCommit leader’s commitIndex
    */
-  public AppendEntriesResult appendEntries(int term, String leaderId, int prevLogIndex, int prevLogTerm, List<LogEntry> entries, int leaderCommit)
+  public AppendEntriesResult appendEntries(long term, String leaderId, long prevLogIndex, long prevLogTerm, List<LogEntry> entries, long leaderCommit)
   {
     AppendEntriesResult result = null;
     reset();
@@ -241,7 +266,11 @@ public class RaftServiceImpl implements RaftService
       }
       finally
       {
-        Metrics.getInstance().getMeter(RaftServiceImpl.class, "entries", (result.isSuccess()?"appended":"nonappended"), "rate").mark();
+        if(result != null)
+        {
+          String key = (result.isSuccess() ? "appended" : "nonappended");
+          Metrics.getInstance().getMeter(RaftServiceImpl.class, "entries", key, "rate").mark();
+        }
       }
     }
   }

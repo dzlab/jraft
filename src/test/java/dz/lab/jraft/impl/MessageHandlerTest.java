@@ -1,9 +1,6 @@
 package dz.lab.jraft.impl;
 
-import dz.lab.jraft.Message;
-import dz.lab.jraft.MessageHandler;
-import dz.lab.jraft.RaftServer;
-import dz.lab.jraft.RaftService;
+import dz.lab.jraft.*;
 import dz.lab.jraft.common.Configuration;
 import dz.lab.jraft.model.AppendMessage;
 import dz.lab.jraft.model.RequestVoteResult;
@@ -97,6 +94,7 @@ public class MessageHandlerTest {
   @Test
   public void testHandleVoteRequestResponse()
   {
+    Storage storage = mock(Storage.class);
     Timer mockTimer = mock(Timer.class);
     // mocks RaftServer
     final RaftServer mockServer1 = mock(RaftServer.class);
@@ -106,8 +104,8 @@ public class MessageHandlerTest {
     doAnswer(new RedirectMessage(mockServer2)).when(mockServer1).send(any(Message.class));
     doAnswer(new RedirectMessage(mockServer1)).when(mockServer2).send(any(Message.class));
     // mocks RaftServiceImpl
-    RaftServiceImpl mockService1 = spy(new RaftServiceImpl(mockServer1, mockTimer, new Configuration()));
-    RaftServiceImpl mockService2 = spy(new RaftServiceImpl(mockServer2, mockTimer, new Configuration()));
+    RaftServiceImpl mockService1 = spy(new RaftServiceImpl(mockServer1, storage, mockTimer, new Configuration()));
+    RaftServiceImpl mockService2 = spy(new RaftServiceImpl(mockServer2, storage, mockTimer, new Configuration()));
 
     // setup handlers
     final VoteMessageHandler handler1 = new VoteMessageHandler(mockServer1, mockService1);

@@ -1,9 +1,6 @@
 package dz.lab.jraft.internal;
 
-import dz.lab.jraft.Message;
-import dz.lab.jraft.MessageHandler;
-import dz.lab.jraft.RaftServer;
-import dz.lab.jraft.RaftService;
+import dz.lab.jraft.*;
 import dz.lab.jraft.common.Configuration;
 import dz.lab.jraft.impl.AppendMessageHandler;
 import dz.lab.jraft.impl.RaftServiceImpl;
@@ -106,10 +103,10 @@ public class BusServer implements RaftServer {
    *
    * @return
    */
-  public static BusServer create(Bus bus, Configuration config, String name, Timer timer)
+  public static BusServer create(Bus bus, Configuration config, String name, Storage storage, Timer timer)
   {
     BusServer server = new BusServer(name, bus);
-    RaftService service = new RaftServiceImpl(server, timer, config);
+    RaftService service = new RaftServiceImpl(server, storage, timer, config);
     server.setService(service);
     // configure message handlers
     server.addHandler(new VoteMessageHandler(server, service));

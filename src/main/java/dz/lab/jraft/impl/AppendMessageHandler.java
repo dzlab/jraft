@@ -9,7 +9,7 @@ import dz.lab.jraft.model.AppendMessage;
 /**
  * An implementation of {@link MessageHandler} to handle {@link AppendMessage} requests and responses.
  */
-public class AppendMessageHandler implements MessageHandler<AppendMessage> {
+public class AppendMessageHandler extends AbsractMessageHandler<AppendMessage> {
 
   private final RaftServer server;
   private final RaftService service;
@@ -24,7 +24,21 @@ public class AppendMessageHandler implements MessageHandler<AppendMessage> {
     return (msg instanceof AppendMessage);
   }
 
-  public void handle(AppendMessage msg) {
+  /**
+   * Handle a received append request message.
+   * @param requestMessage the vote request.
+   */
+  @Override protected void handleRequest(AppendMessage requestMessage)
+  {
+
+  }
+
+  /**
+   * Handle a received append response message.
+   * @param responseMessage the vote response.
+   */
+  @Override protected void handleResponse(AppendMessage responseMessage)
+  {
 
   }
 }

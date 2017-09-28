@@ -15,5 +15,5 @@ public interface RaftService extends Lifecycle {
 
   void receiveVote(String id, long term, boolean voteGranted);
 
-  AppendEntriesResult appendEntries(int term, String leaderId, int prevLogIndex, int prevLogTerm, List<LogEntry> entries, int leaderCommit);
+  AppendEntriesResult appendEntries(long term, String leaderId, long prevLogIndex, long prevLogTerm, List<LogEntry> entries, long leaderCommit);
 }

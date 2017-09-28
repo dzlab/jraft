@@ -10,7 +10,7 @@ import dz.lab.jraft.model.VoteMessage;
 /**
  * An implementation of {@link MessageHandler} to handle {@link VoteMessage} requests and responses.
  */
-public class VoteMessageHandler implements MessageHandler<VoteMessage> {
+public class VoteMessageHandler extends AbsractMessageHandler<VoteMessage> {
 
   private final RaftServer server;
   private final RaftService service;
@@ -26,24 +26,11 @@ public class VoteMessageHandler implements MessageHandler<VoteMessage> {
     return (msg instanceof VoteMessage);
   }
 
-  public void handle(VoteMessage msg)
-  {
-    switch (msg.getType())
-    {
-      case REQUEST:
-        handleVoteRequest(msg);
-        break;
-      case RESPONSE:
-        handleVoteResponse(msg);
-        break;
-    }
-  }
-
   /**
    * Handle a received vote request message.
    * @param requestMessage the vote request.
    */
-  private void handleVoteRequest(VoteMessage requestMessage)
+  @Override protected void handleRequest(VoteMessage requestMessage)
   {
     VoteMessage.RequestBody body = (VoteMessage.RequestBody) requestMessage.getBody();
     RequestVoteResult result = this.service.requestVote(body.getCandidateId(), body.getTerm(), body.getLastLogIndex(), body.getLastLogTerm());
@@ -56,7 +43,7 @@ public class VoteMessageHandler implements MessageHandler<VoteMessage> {
    * Handle a received vote response message.
    * @param responseMessage the vote response.
    */
-  private void handleVoteResponse(VoteMessage responseMessage)
+  @Override protected void handleResponse(VoteMessage responseMessage)
   {
     VoteMessage.ResponseBody body = (VoteMessage.ResponseBody) responseMessage.getBody();
     this.service.receiveVote(responseMessage.getSource(), body.getTerm(), body.isVoteGranted());
